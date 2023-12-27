@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  agri_chat
+
+Globals:
+  Function:
+    Timeout: 20
+    Runtime: python3.9
+    CodeUri: agri_chat/
+    MemorySize: 256
+    Architectures:
+      - x86_64
+  
+Resources:
+  BackendApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Methods: "'*'"
+  ChatGPTFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers.app.lambda_handler
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /hello
+            Method: get
+
