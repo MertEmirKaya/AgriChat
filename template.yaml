@@ -50,4 +50,15 @@ Resources:
             RestApiId: !Ref BackendApi
             Path: /chat_gpt
             Method: get
+  RegisterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers.auth.register
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /register
+            Method: post
 
