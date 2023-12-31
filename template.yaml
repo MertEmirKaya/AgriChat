@@ -31,12 +31,12 @@ Resources:
   ChatGPTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: handlers.app.lambda_handler
+      Handler: handlers.chat_gpt.chat_gpt
       Events:
         Root:
           Type: Api
           Properties:
             RestApiId: !Ref BackendApi
-            Path: /hello
+            Path: /chat_gpt
             Method: get
 
