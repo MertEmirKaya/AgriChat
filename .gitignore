@@ -161,6 +161,7 @@ cython_debug/
 
 #sam
 samconfig.toml
+.aws-sam/
 
 # pre-commit
 .pre-commit-config.yaml
