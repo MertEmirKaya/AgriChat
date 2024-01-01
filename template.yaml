@@ -30,6 +30,21 @@ Resources:
               Access-Control-Allow-Headers: "'*'"
               Access-Control-Allow-Origin: "'*'"
               Access-Control-Allow-Methods: "'*'"
+  MyDynamoDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: Users
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
   DependenciesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -39,10 +54,14 @@ Resources:
       CompatibleRuntimes:
         - python3.9
       RetentionPolicy: Delete
+    Metadata:
+      BuildMethod: python3.9
+      BuildArchitecture: x86_64
   ChatGPTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: handlers.chat_gpt.chat_gpt
+      FunctionName: chat-gpt-function
+      Handler: handlers/chat_gpt.chat_gpt
       Events:
         Root:
           Type: Api
@@ -53,7 +72,8 @@ Resources:
   RegisterFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: handlers.auth.register
+      FunctionName: register-function
+      Handler: handlers/authentication.register
       Events:
         Root:
           Type: Api
@@ -61,4 +81,30 @@ Resources:
             RestApiId: !Ref BackendApi
             Path: /register
             Method: post
-
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: MyDynamoDBTable
+          Permissions:
+            - Write
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: login-function
+      Handler: handlers/authentication.login
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /login
+            Method: post
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: MyDynamoDBTable
+          Permissions:
+            - Write
+            - Read

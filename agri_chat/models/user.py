@@ -15,8 +15,7 @@ class User(Model):
         table_name = "Users"
         region = "eu-west-1"
 
-    id = UnicodeAttribute(hash_key=True)
-    email = UnicodeAttribute(range_key=True)
+    email = UnicodeAttribute(hash_key=True)
     first_name = UnicodeAttribute()
     last_name = UnicodeAttribute()
     hashed_password = UnicodeAttribute()
