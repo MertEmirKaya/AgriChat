@@ -11,7 +11,9 @@ Globals:
     MemorySize: 256
     Architectures:
       - x86_64
-  
+    Layers:
+      - !Ref DependenciesLayer
+
 Resources:
   BackendApi:
     Type: AWS::Serverless::Api
@@ -28,6 +30,15 @@ Resources:
               Access-Control-Allow-Headers: "'*'"
               Access-Control-Allow-Origin: "'*'"
               Access-Control-Allow-Methods: "'*'"
+  DependenciesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: agri-chat-dependencies
+      Description: Dependencies for agri_chat
+      ContentUri: dependencies/
+      CompatibleRuntimes:
+        - python3.9
+      RetentionPolicy: Delete
   ChatGPTFunction:
     Type: AWS::Serverless::Function
     Properties:
