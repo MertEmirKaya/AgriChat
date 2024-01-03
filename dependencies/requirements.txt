@@ -44,6 +44,8 @@ pydantic==2.5.3
     # via openai
 pydantic-core==2.14.6
     # via pydantic
+pyjwt==2.8.0
+    # via -r agri_chat/requirements/base.pip
 pynamodb==5.5.1
     # via -r agri_chat/requirements/base.pip
 python-dateutil==2.8.2
