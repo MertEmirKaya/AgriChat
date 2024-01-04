@@ -47,7 +47,7 @@ Resources:
       Auth:
         DefaultAuthorizer: !GetAtt AuthorizerFunction.Arn
 
-  UsersTable:
+  MyDynamoDBTable:
     Type: 'AWS::DynamoDB::Table'
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -128,7 +128,7 @@ Resources:
       MyConn:
         Properties:
           Destination:
-            Id: UsersTable
+            Id: MyDynamoDBTable
           Permissions:
             - Write
   LoginFunction:
@@ -149,7 +149,7 @@ Resources:
       MyConn:
         Properties:
           Destination:
-            Id: UsersTable
+            Id: MyDynamoDBTable
           Permissions:
             - Write
             - Read
