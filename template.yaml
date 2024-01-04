@@ -46,7 +46,8 @@ Resources:
               Access-Control-Allow-Methods: "'*'"
       Auth:
         DefaultAuthorizer: !GetAtt AuthorizerFunction.Arn
-  MyDynamoDBTable:
+
+  UsersTable:
     Type: 'AWS::DynamoDB::Table'
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -61,6 +62,23 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+
+  FormsTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: Forms
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  
   DependenciesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -110,7 +128,7 @@ Resources:
       MyConn:
         Properties:
           Destination:
-            Id: MyDynamoDBTable
+            Id: UsersTable
           Permissions:
             - Write
   LoginFunction:
@@ -131,7 +149,7 @@ Resources:
       MyConn:
         Properties:
           Destination:
-            Id: MyDynamoDBTable
+            Id: UsersTable
           Permissions:
             - Write
             - Read
