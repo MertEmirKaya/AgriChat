@@ -173,4 +173,23 @@ Resources:
             Id: FormsTable
           Permissions:
             - Write
+  
+  GetFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: get-form-function
+      Handler: handlers/forms.get_form
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /forms/{id}
+            Method: GET
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: FormsTable
+          Permissions:
             - Read

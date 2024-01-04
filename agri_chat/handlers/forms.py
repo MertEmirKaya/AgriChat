@@ -22,3 +22,12 @@ def create_form(event:dict[str, Any], context:dict[str, Any]) -> dict[str, Any]:
 
     return status_json({"message": "Form created successfully."}, 200)
 
+
+def get_form(event:dict[str, Any], context:dict[str, Any]) -> dict[str, Any]:
+    """Get a form."""
+    try:
+        form = Form.get(hash_key=event["pathParameters"]["id"])
+    except Form.DoesNotExist:
+        return status_json({"message": "Form not found."}, 404)
+
+    return status_json(form.attribute_values, 200)
