@@ -153,3 +153,24 @@ Resources:
           Permissions:
             - Write
             - Read
+
+  CreateFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: create-form-function
+      Handler: handlers/forms.create_form
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /forms
+            Method: POST
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: FormsTable
+          Permissions:
+            - Write
+            - Read
