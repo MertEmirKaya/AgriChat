@@ -3,6 +3,17 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   agri_chat
 
+Parameters:
+  SecretKey:
+    Type: String
+    Description: Secret key for the jwt
+    NoEcho: true
+
+  OpenAIKey:
+    Type: String
+    Description: OpenAI API key
+    NoEcho: true
+
 Globals:
   Function:
     Timeout: 20
@@ -13,7 +24,10 @@ Globals:
       - x86_64
     Layers:
       - !Ref DependenciesLayer
-
+    Environment:
+        Variables:
+          SECRET_KEY: !Ref SecretKey
+          OPENAI_API_KEY: !Ref OpenAIKey
 Resources:
   BackendApi:
     Type: AWS::Serverless::Api
@@ -30,6 +44,23 @@ Resources:
               Access-Control-Allow-Headers: "'*'"
               Access-Control-Allow-Origin: "'*'"
               Access-Control-Allow-Methods: "'*'"
+      Auth:
+        DefaultAuthorizer: !GetAtt AuthorizerFunction.Arn
+  MyDynamoDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: Users
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
   DependenciesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -39,15 +70,68 @@ Resources:
       CompatibleRuntimes:
         - python3.9
       RetentionPolicy: Delete
+    Metadata:
+      BuildMethod: python3.9
+      BuildArchitecture: x86_64
+  
+  AuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: authorizer-function
+      Handler: handlers/authorization.authorizer
+
   ChatGPTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: handlers.chat_gpt.chat_gpt
+      FunctionName: chat-gpt-function
+      Handler: handlers/chat_gpt.chat_gpt
       Events:
         Root:
           Type: Api
           Properties:
             RestApiId: !Ref BackendApi
             Path: /chat_gpt
-            Method: get
-
+            Method: GET
+  RegisterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: register-function
+      Handler: handlers/authentication.register
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /register
+            Method: POST
+            Auth:
+              Authorizer: NONE
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: MyDynamoDBTable
+          Permissions:
+            - Write
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: login-function
+      Handler: handlers/authentication.login
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /login
+            Method: POST
+            Auth:
+              Authorizer: NONE
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: MyDynamoDBTable
+          Permissions:
+            - Write
+            - Read
