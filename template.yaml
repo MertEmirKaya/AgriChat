@@ -79,6 +79,22 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
   
+  MessagesTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: Messages
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
   DependenciesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
