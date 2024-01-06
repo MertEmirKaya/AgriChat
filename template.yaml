@@ -234,3 +234,24 @@ Resources:
           Permissions:
             - Write
             - Read
+
+  UpdateFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: update-form-function
+      Handler: handlers/forms.update_form
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /forms/{id}
+            Method: PATCH
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: FormsTable
+          Permissions:
+            - Write
+            - Read
