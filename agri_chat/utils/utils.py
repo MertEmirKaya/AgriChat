@@ -26,5 +26,4 @@ def status_json(
 def get_token_data(token: str) -> dict[str, Any]:
     """Return the token data from the given token."""
     payload = jwt.decode(token, key=os.environ["SECRET_KEY"], algorithms=['HS256'])
-    print(payload)
     return payload
