@@ -40,7 +40,7 @@ def login(event:dict[str, Any], context:dict[str, Any]) -> dict[str, Any]:
     entered_password = body.get("password", "").encode("utf-8")
     hashed_password = bcrypt.hashpw(entered_password, user.salt.encode("utf-8")).decode("utf-8")
     if hashed_password == user.hashed_password:
-        expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=12)
 
         payload = {
             "email": user.email,

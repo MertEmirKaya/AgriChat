@@ -1,7 +1,10 @@
 """Utility functions for the agri_chat application."""
 
 import json
+import os
 from typing import Any
+
+import jwt
 
 
 def status_json(
@@ -18,3 +21,9 @@ def status_json(
         },
         "body": json.dumps(body),
     }
+
+
+def get_token_data(token: str) -> dict[str, Any]:
+    """Return the token data from the given token."""
+    payload = jwt.decode(token, key=os.environ["SECRET_KEY"], algorithms=['HS256'])
+    return payload

@@ -46,6 +46,7 @@ Resources:
               Access-Control-Allow-Methods: "'*'"
       Auth:
         DefaultAuthorizer: !GetAtt AuthorizerFunction.Arn
+
   MyDynamoDBTable:
     Type: 'AWS::DynamoDB::Table'
     DeletionPolicy: Retain
@@ -61,6 +62,23 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+
+  FormsTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: Forms
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  
   DependenciesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -132,6 +150,108 @@ Resources:
         Properties:
           Destination:
             Id: MyDynamoDBTable
+          Permissions:
+            - Write
+            - Read
+
+  CreateFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: create-form-function
+      Handler: handlers/forms.create_form
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /forms
+            Method: POST
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: FormsTable
+          Permissions:
+            - Write
+  
+  GetFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: get-form-function
+      Handler: handlers/forms.get_form
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /forms/{id}
+            Method: GET
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: FormsTable
+          Permissions:
+            - Read
+  
+  ListFormsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: list-forms-function
+      Handler: handlers/forms.list_forms
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /forms
+            Method: GET
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: FormsTable
+          Permissions:
+            - Read
+  
+  DeleteFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: delete-form-function
+      Handler: handlers/forms.delete_form
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /forms/{id}
+            Method: DELETE
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: FormsTable
+          Permissions:
+            - Write
+            - Read
+
+  UpdateFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: update-form-function
+      Handler: handlers/forms.update_form
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /forms/{id}
+            Method: PATCH
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: FormsTable
           Permissions:
             - Write
             - Read
