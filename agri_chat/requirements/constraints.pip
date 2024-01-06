@@ -12,7 +12,7 @@ anyio==4.2.0
     #   openai
 bcrypt==4.1.2
     # via -r agri_chat/requirements/base.pip
-botocore==1.34.11
+botocore==1.34.14
     # via pynamodb
 certifi==2023.11.17
     # via
@@ -47,6 +47,10 @@ pydantic-core==2.14.6
 pyjwt==2.8.0
     # via -r agri_chat/requirements/base.pip
 pynamodb==5.5.1
+    # via
+    #   -r agri_chat/requirements/base.pip
+    #   pynamodb-encoder
+pynamodb-encoder==0.1.2
     # via -r agri_chat/requirements/base.pip
 python-dateutil==2.8.2
     # via botocore
