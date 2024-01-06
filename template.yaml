@@ -213,3 +213,24 @@ Resources:
             Id: FormsTable
           Permissions:
             - Read
+  
+  DeleteFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: delete-form-function
+      Handler: handlers/forms.delete_form
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BackendApi
+            Path: /forms/{id}
+            Method: DELETE
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: FormsTable
+          Permissions:
+            - Write
+            - Read

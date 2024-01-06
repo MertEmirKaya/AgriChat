@@ -27,12 +27,13 @@ def create_form(event:dict[str, Any], context:dict[str, Any]) -> dict[str, Any]:
 
 def get_form(event:dict[str, Any], context:dict[str, Any]) -> dict[str, Any]:
     """Get a form."""
+    encoder = Encoder()
     try:
         form = Form.get(hash_key=event["pathParameters"]["id"])
     except Form.DoesNotExist:
         return status_json({"message": "Form not found."}, 404)
 
-    return status_json(form.attribute_values, 200)
+    return status_json(encoder.encode(form), 200)
 
 
 def list_forms(event:dict[str, Any], context:dict[str, Any]) -> dict[str, Any]:
@@ -41,3 +42,18 @@ def list_forms(event:dict[str, Any], context:dict[str, Any]) -> dict[str, Any]:
     encoder = Encoder()
     forms_list = [encoder.encode(item) for item in forms]
     return status_json({"result": forms_list}, 200)
+
+
+def delete_form(event:dict[str, Any], context:dict[str, Any]) -> dict[str, Any]:
+    """Delete a form."""
+    try:
+        form = Form.get(hash_key=event["pathParameters"]["id"])
+    except Form.DoesNotExist:
+        return status_json({"message": "Form not found."}, 404)
+
+    token_data = get_token_data(event["headers"]["Authorization"])
+    if form.user_email != token_data["email"]:
+        return status_json({"message": "You are not authorized to delete this form."}, 401)
+
+    form.delete()
+    return status_json({"message": "Form deleted."}, 200)
