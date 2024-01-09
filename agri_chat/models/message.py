@@ -1,8 +1,9 @@
 """The message model for chat-gpt messages."""
 
+import uuid
 from datetime import datetime
 
-from pynamodb.attributes import UnicodeAttribute, UTCDateTimeAttribute
+from pynamodb.attributes import BooleanAttribute, UnicodeAttribute, UTCDateTimeAttribute
 from pynamodb.models import Model
 
 
@@ -15,7 +16,8 @@ class Message(Model):
         table_name = "Messages"
         region = "eu-west-1"
 
-    id = UnicodeAttribute(hash_key=True)
-    owner = UnicodeAttribute(range_key=True) # either user email or "bot"
+    owner = UnicodeAttribute(hash_key=True)
+    id = UnicodeAttribute(range_key=True, default=uuid.uuid4().hex)
+    bot = BooleanAttribute(null=True, default=False)
     text = UnicodeAttribute()
     created_at = UTCDateTimeAttribute(default=datetime.now)
