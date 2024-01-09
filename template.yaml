@@ -86,11 +86,15 @@ Resources:
     Properties:
       TableName: Messages
       AttributeDefinitions:
+        - AttributeName: owner
+          AttributeType: S
         - AttributeName: id
           AttributeType: S
       KeySchema:
-        - AttributeName: id
+        - AttributeName: owner
           KeyType: HASH
+        - AttributeName: id
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
@@ -126,6 +130,15 @@ Resources:
             RestApiId: !Ref BackendApi
             Path: /chat_gpt
             Method: GET
+    Connectors:
+      MyConn:
+        Properties:
+          Destination:
+            Id: MessagesTable
+          Permissions:
+            - Write
+            - Read
+
   RegisterFunction:
     Type: AWS::Serverless::Function
     Properties:
